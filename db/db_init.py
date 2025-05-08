@@ -11,14 +11,18 @@ def init_chat_message_table():
         charset=DB_CONFIG['charset']
     )
     cursor = conn.cursor()
+    # cursor.execute("DROP TABLE IF EXISTS chat_message;")
     sql = '''
     CREATE TABLE IF NOT EXISTS chat_message (
         id INT AUTO_INCREMENT PRIMARY KEY COMMENT '消息ID',
+        msg_id VARCHAR(255) COMMENT '消息id',
         sender VARCHAR(255) NOT NULL COMMENT '发送者',
-        receiver VARCHAR(255) NOT NULL COMMENT '接收者',
+        sender_remark VARCHAR(255) COMMENT '发送者备注名',
         msg_time DATETIME NOT NULL COMMENT '时间',
         window_name VARCHAR(255) NOT NULL COMMENT '窗口名称',
-        content TEXT COMMENT '内容'
+        type VARCHAR(64) COMMENT '消息类型',
+        content TEXT COMMENT '内容',
+        info TEXT COMMENT '原始消息信息'
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     '''
     cursor.execute(sql)

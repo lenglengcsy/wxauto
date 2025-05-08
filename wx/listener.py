@@ -23,12 +23,12 @@ class MessageListener:
     def listen_forever(self, callback):
         """
         持续监听消息，每当有新消息时调用callback。
-        callback参数为(chat, msg_item)
+        callback参数为(window_name, msg_item)
         """
         while True:
             msgs = self.listen_once()
-            for chat in msgs:
-                msg = msgs.get(chat)
-                for item in msg:
-                    callback(chat, item)
+            # 用zip将监听名称与消息内容绑定
+            for name, chat_msgs in zip(self.listen_list, msgs.values()):
+                for item in chat_msgs:
+                    callback(name, item)
             time.sleep(self.wait) 

@@ -47,3 +47,4 @@ def list_chat_messages():
         return rows
     finally:
         close_connection(conn) 
+
