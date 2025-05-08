@@ -8,9 +8,9 @@ COZE_API_BASE_URL = "https://api.coze.cn"
 # pat_ZkcWZVF8qgXtgs4T8WZzqYeEcXx5t5z6iNS89O5ZFfyevfe5QxMg75TSlzi1wbKR
 
 def get_coze_config():
-    """获取coze平台配置信息"""
-    return {
-        "api_key": COZE_API_KEY,
-        "bot_id": COZE_BOT_ID,
-        "base_url": COZE_API_BASE_URL,
-    }
+	"""获取coze平台配置信息"""
+	return {
+		"api_key": COZE_API_KEY,
+		"bot_id": COZE_BOT_ID,
+		"base_url": COZE_API_BASE_URL,
+	}

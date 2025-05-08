@@ -11,7 +11,7 @@ class MessageListener:
 
 	def _init_listeners(self):
 		for who in self.listen_list:
-			self.wx.AddListenChat(who=who, savepic=True, savefile=True, savevoice=True)
+			self.wx.AddListenChat(who=who, savepic=True, savefile=True, savevoice=True, parseurl=True)
 
 	def listen_once(self) -> Dict[str, Any]:
 		"""
@@ -37,6 +37,7 @@ class MessageListener:
 						continue
 					if item.details['chat_type'] in ('friend', ):
 						callback(chat, item.details['chat_name'], item)
-					if item.details['chat_type'] in ('group', ) and '@AI小助手' in item.content:
+					if item.details['chat_type'] in ('group', ) and f'@{self.wx.nickname}' in item.content:
 						callback(chat, item.details['chat_name'], item)
-			time.sleep(self.wait) 
+			# time.sleep(self.wait) 
+			time.sleep(10) 
