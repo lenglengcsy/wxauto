@@ -37,6 +37,6 @@ class MessageListener:
 						continue
 					if item.details['chat_type'] in ('friend', ):
 						callback(chat, item.details['chat_name'], item)
-					if item.details['chat_type'] in ('group', ) and item.content[:3] == '@AI':
+					if item.details['chat_type'] in ('group', ) and '@AI小助手' in item.content:
 						callback(chat, item.details['chat_name'], item)
 			time.sleep(self.wait) 
