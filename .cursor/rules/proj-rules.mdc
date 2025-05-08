@@ -20,6 +20,10 @@ alwaysApply: true
 #### prompt
 这个目录下用于配置各种prompt
 
+### lib
+#### wxauto和wxautox
+特别注意：接口参考wxauto，但是实际上使用的需要是wxautox `from wxautox import WeChat`
+
 
 ### db
 MySQL数据库访问模块
