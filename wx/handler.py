@@ -3,7 +3,7 @@ from lib.cozepy.chat import MessageType
 from llm.coze.client import CozeClient
 from wxautox import WeChat
 from typing import Any
-from wx.history import get_recent_history
+from wx.history import get_recent_history, add_message_to_history
 from cozepy.chat import Message
 
 def handle_message(chat, msg_item: Any, window_messages: list) -> None:
@@ -22,6 +22,7 @@ def handle_message(chat, msg_item: Any, window_messages: list) -> None:
 	for msg in window_messages[:]:
 		print(f"收到消息：窗口={chat.who}, {field_str}")
 		process_and_save_message(chat.who, msg)
+		add_message_to_history(chat.who, msg)
 		if msg.sender in ('Self', ):
 			window_messages.remove(msg)
 
@@ -52,15 +53,15 @@ def handle_message(chat, msg_item: Any, window_messages: list) -> None:
 		)
 		additional_messages.append(user_message)
 	
-	for item in window_messages:
-		user_message = Message(
-			role="user",
-			type="question",
-			content=item.content,
-			content_type="text"
-		)
-		additional_messages.append(user_message)
-
+	# for item in window_messages:
+	# 	user_message = Message(
+	# 		role="user",
+	# 		type="question",
+	# 		content=item.content,
+	# 		content_type="text"
+	# 	)
+	# 	additional_messages.append(user_message)
+	item = window_messages[0]
 	# 调用coze获取回复
 	coze_client = CozeClient()
 	coze_response = coze_client.send_message(additional_messages, user_id=item.sender_remark)
