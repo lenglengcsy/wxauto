@@ -3,8 +3,10 @@ from lib.cozepy.chat import MessageType
 from llm.coze.client import CozeClient
 from wxautox import WeChat
 from typing import Any
+from wx.history import get_recent_history
+from cozepy.chat import Message
 
-def handle_message(wx, chat: str, msg_item: Any) -> None:
+def handle_message(chat, msg_item: Any, window_messages: list) -> None:
 	"""
 	处理收到的消息：
 	1. 保存消息到数据库
@@ -17,16 +19,51 @@ def handle_message(wx, chat: str, msg_item: Any) -> None:
 		'type', 'content', 'sender', 'sender_remark', 'info', 'control', 'id', 'details'
 	]
 	field_str = ', '.join(f"{field}={getattr(msg_item, field, None)}" for field in fields)
-	print(f"收到消息：窗口={chat}, {field_str}")
-	process_and_save_message(chat, msg_item)
+	for msg in window_messages[:]:
+		print(f"收到消息：窗口={chat.who}, {field_str}")
+		process_and_save_message(chat.who, msg)
+		if msg.sender in ('Self', ):
+			window_messages.remove(msg)
 
-	# 只处理文本消息
-	if not hasattr(msg_item, 'content') or not msg_item.content:
+	if not window_messages:
 		return
 	
+	# # 只处理文本消息
+	# if not hasattr(msg_item, 'content') or not msg_item.content:
+	# 	return
+	additional_messages = []
+
+	# 1. 获取历史聊天记录
+	history = get_recent_history(chat.who)
+	# 2. 组装additional_messages
+	additional_messages = []
+	# 2.1 先加历史消息
+	for row in history:
+		role="user"
+		type="question"
+		if row[2] != msg.sender_remark:
+			role = 'assistant'
+			type = 'answer'
+		user_message = Message(
+			role=role,
+			type=type,
+			content=row[7],
+			content_type="text"
+		)
+		additional_messages.append(user_message)
+	
+	for item in window_messages:
+		user_message = Message(
+			role="user",
+			type="question",
+			content=item.content,
+			content_type="text"
+		)
+		additional_messages.append(user_message)
+
 	# 调用coze获取回复
 	coze_client = CozeClient()
-	coze_response = coze_client.send_message(message=msg_item.content, user_id=str(getattr(msg_item, 'sender', 'default_user')))
+	coze_response = coze_client.send_message(additional_messages, user_id=item.sender_remark)
 	# 提取coze回复内容（取最后一条role为assistant的消息）
 	reply = None
 	for m in reversed(coze_response.get('messages', [])):

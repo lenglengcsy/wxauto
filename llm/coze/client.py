@@ -3,7 +3,7 @@ from llm.coze.config import get_coze_config
 # 正确导入cozepy的Coze类
 from cozepy.coze import Coze as RawCozeClient
 from cozepy.auth import TokenAuth
-from cozepy.chat import Message
+
 
 
 class CozeClient:
@@ -19,7 +19,7 @@ class CozeClient:
 			base_url=self.base_url
 		)
 
-	def send_message(self, message: str, user_id: Optional[str] = None, **kwargs: Any) -> Dict[str, Any]:
+	def send_message(self, additional_messages: str, user_id: Optional[str] = None, **kwargs: Any) -> Dict[str, Any]:
 		"""
 		发送消息到coze平台，自动轮询并返回最终消息内容。
 		:param message: 用户输入的消息内容
@@ -27,16 +27,16 @@ class CozeClient:
 		:param kwargs: 其他可选参数
 		:return: 包含chat对象和所有消息内容的字典
 		"""
-		user_message = Message(
-			role="user",
-			type="question",
-			content=message,
-			content_type="text"
-		)
+		# user_message = Message(
+		# 	role="user",
+		# 	type="question",
+		# 	content=message,
+		# 	content_type="text"
+		# )
 		chat_poll = self.client.chat.create_and_poll(
 			bot_id=self.bot_id,
 			user_id=user_id or "default_user",
-			additional_messages=[user_message],
+			additional_messages=additional_messages,
 			**kwargs
 		)
 		return {

@@ -27,3 +27,13 @@
 3. 表初始化流程调整为：先DROP TABLE IF EXISTS chat_message，再CREATE，确保结构一致。
 4. 遇到ModuleNotFoundError时，建议用python -m db.db_init方式在项目根目录下初始化表结构。
 5. 遇到Unknown table 'CHAT_MESSAGE' in information_schema时，需注意表名大小写、数据库连接配置及表是否已成功创建。
+
+---
+
+# 聊天历史记录加载与内存缓存开发过程
+
+1. 需求：程序启动时自动拉取wx/config.py中LISTEN_LIST配置的所有窗口的最近20条聊天记录，并存入内存，便于后续AI上下文拼接。
+2. 初步实现：在run.py中实现load_recent_histories函数，遍历LISTEN_LIST，调用db.crud.get_chat_history_by_window_name获取历史消息，存入recent_histories字典。
+3. 结构优化：根据项目规划，将历史聊天记录的加载与缓存逻辑迁移到wx/history.py，提供load_recent_histories和get_recent_history接口，内存缓存data为全局变量。
+4. 主程序run.py中仅需调用wx.history.load_recent_histories(LISTEN_LIST)，并可通过wx.history.data或get_recent_history(window_name)获取历史消息。
+5. 这样实现后，历史消息的加载、缓存、访问逻辑与监听、消息处理等业务解耦，结构更清晰，便于维护和扩展。
