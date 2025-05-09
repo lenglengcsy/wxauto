@@ -19,6 +19,19 @@
 
 ---
 
+# 企业微信API模块开发过程记录
+
+1. 设计qywx/api目录结构，包含client.py、message.py、http_client.py等文件，client.py负责API封装，http_client.py统一处理http请求。
+2. 实现http_client.py，封装http_get和http_post方法，所有API请求均通过该模块，便于统一异常处理和扩展。
+3. 在client.py中实现QywxClient类，支持access_token获取、消息发送、成员userid查询、部门信息查询等功能。
+4. 将原utils.py中的成员和部门查询方法合并到QywxClient类，接口更统一，易于维护。
+5. 增加API调用的容错处理，遇到错误码时输出详细错误信息，避免程序崩溃。
+6. 配置企业微信API可信IP白名单，确保API调用不会因IP限制报错（如60020），相关设置在企业微信管理后台"我的企业-企业可信IP"中完成。
+7. 通过config.py集中管理corp_id、corp_secret、agentid等敏感信息，提升安全性和可维护性。
+8. 编写test_qywx_send.py等测试脚本，验证API功能的正确性。
+
+---
+
 # 近期重要交互与数据库升级记录
 
 1. 对chat_message表结构进行升级，去除receiver字段，新增msg_id、sender_remark、type、info等字段，结构如下：
