@@ -5,6 +5,8 @@ from wxautox import WeChat
 from typing import Any
 from wx.history import get_recent_history, add_message_to_history
 from cozepy.chat import Message
+import time
+import pyperclip
 
 def handle_message(chat, msg_item: Any, window_messages: list) -> None:
 	"""
@@ -23,6 +25,7 @@ def handle_message(chat, msg_item: Any, window_messages: list) -> None:
 		print(f"收到消息：窗口={chat.who}, {field_str}")
 		process_and_save_message(chat.who, msg)
 		add_message_to_history(chat.who, msg)
+		extract_quote_msg(msg)
 		if msg.sender in ('Self', ):
 			window_messages.remove(msg)
 
@@ -42,7 +45,7 @@ def handle_message(chat, msg_item: Any, window_messages: list) -> None:
 	for row in history:
 		role="user"
 		type="question"
-		if row[2] != msg.sender_remark:
+		if row[2] != msg_item.sender_remark:
 			role = 'assistant'
 			type = 'answer'
 		user_message = Message(
@@ -78,4 +81,31 @@ def handle_message(chat, msg_item: Any, window_messages: list) -> None:
 	# msg_item.quote(reply)
 	# wx = WeChat()
 	# wx.SendMsg(reply) 
-	msg_item.quote(reply, at=[msg_item.sender])
+	safe_quote(msg_item, reply)
+
+def safe_quote(msg_item: Any, reply: str) -> None:
+	retries: int = 5
+	delay: float = 0.2
+	for i in range(retries):
+		try:
+			msg_item.quote(reply, at=[msg_item.sender])
+			return
+		except pyperclip.PyperclipException as e:
+			if i == retries - 1:
+				print(f"剪贴板异常，已重试{retries}次，仍失败：{e}")
+				# 你可以选择记录日志、通知用户，或者直接跳过
+			else:
+				time.sleep(delay)
+
+def extract_quote_msg(msg: Any) -> None:
+	"""
+	从msg.content中提取引用消息，动态添加msg.quote_msg字段
+	"""
+	sep = '\n引用  的消息 : '
+	content: str = getattr(msg, 'content', '')
+	if sep in content:
+		user_content, quote_msg = content.split(sep, 1)
+		msg.content = user_content.strip()
+		msg.quote_msg = quote_msg.strip()
+	else:
+		msg.quote_msg = None
