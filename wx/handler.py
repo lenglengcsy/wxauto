@@ -22,10 +22,10 @@ def handle_message(chat, msg_item: Any, window_messages: list) -> None:
 	]
 	field_str = ', '.join(f"{field}={getattr(msg_item, field, None)}" for field in fields)
 	for msg in window_messages[:]:
+		extract_quote_msg(msg)
 		print(f"收到消息：窗口={chat.who}, {field_str}")
 		process_and_save_message(chat.who, msg)
 		add_message_to_history(chat.who, msg)
-		extract_quote_msg(msg)
 		if msg.sender in ('Self', ):
 			window_messages.remove(msg)
 
@@ -51,7 +51,7 @@ def handle_message(chat, msg_item: Any, window_messages: list) -> None:
 		user_message = Message(
 			role=role,
 			type=type,
-			content=row[7],
+			content=f"{row[7]}  [{role}引用的消息：{row[8]}]",
 			content_type="text"
 		)
 		additional_messages.append(user_message)

@@ -15,8 +15,9 @@ def process_and_save_message(chat, msg_item):
 	window_name = chat
 	type_ = getattr(msg_item, 'type', '')
 	content = getattr(msg_item, 'content', '')
+	quote_msg = getattr(msg_item, 'quote_msg', None)
 	info = getattr(msg_item, 'info', None)
 	if isinstance(msg_time, datetime):
 		msg_time = msg_time.strftime('%Y-%m-%d %H:%M:%S')
 	info_str = json.dumps(info, ensure_ascii=False) if info is not None else ''
-	save_message(msg_id, sender, sender_remark, msg_time, window_name, type_, content, info_str) 
+	save_message(msg_id, sender, sender_remark, msg_time, window_name, type_, content, quote_msg, info_str) 
