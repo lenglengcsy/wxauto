@@ -10,7 +10,7 @@ from lark_oapi.api.sheets.v3.model import Spreadsheet, QuerySpreadsheetSheetRequ
 import requests
 from lark_oapi.api.drive.v2 import *
 from lark_oapi.api.drive.v2.model import PatchPermissionPublicRequest, PermissionPublic
-
+from lark.config import get_app_access_token
 
 def add_collaborator(spreadsheet_token: str, open_id: str, user_access_token: str):
 	url = f"https://open.feishu.cn/open-apis/sheets/v3/spreadsheets/{spreadsheet_token}/collaborators/add"
@@ -85,7 +85,7 @@ def excel_to_lark_sheet(file_path: str, sheet_title: str = '嘉爱库存') -> st
 	df = read_jiaikucun_excel(file_path)
 	# 1. 创建电子表格
 	client = lark.Client.builder().enable_set_token(True).build()
-	LARK_USER_ACCESS_TOKEN = lark.get_app_access_token()
+	LARK_USER_ACCESS_TOKEN = get_app_access_token()
 	option = lark.RequestOption.builder().user_access_token(LARK_USER_ACCESS_TOKEN).build()
 	create_req_body = Spreadsheet.builder().title(sheet_title).build()
 	create_req = CreateSpreadsheetRequest.builder().request_body(create_req_body).build()
